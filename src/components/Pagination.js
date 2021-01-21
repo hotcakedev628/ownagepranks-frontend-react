@@ -5,15 +5,17 @@ import {
   PaginationLink
 } from 'reactstrap';
 
-const CategoriesPagination = ({
+const PaginationComponent = ({
   currentPage,
   countPage,
-  onPreviousClick,
-  onNextClick,
+  onPrevious,
+  onNext,
   onPageClick
 }) => {
   return (
-    <Pagination aria-label="Categories Navigation">
+    <Pagination aria-label="Pagination"
+      className="d-flex justify-content-center"
+    >
       <PaginationItem
         disabled={currentPage <= 1}
       >
@@ -29,13 +31,13 @@ const CategoriesPagination = ({
         <PaginationLink
           previous
           href="#"
-          onClick={onPreviousClick}
+          onClick={onPrevious}
         />
       </PaginationItem>
       {
         [...Array(countPage)].map((page, i) => (
           <PaginationItem active={i + 1 === currentPage} key={i}>
-            <PaginationLink onClick={e => onPageClick(e, i + 1)} href="#">
+            <PaginationLink onClick={e => onPageClick(e, i + 1)}>
               {i + 1}
             </PaginationLink>
           </PaginationItem>
@@ -47,7 +49,7 @@ const CategoriesPagination = ({
         <PaginationLink
           next
           href="#"
-          onClick={onNextClick}
+          onClick={onNext}
         />
       </PaginationItem>
       <PaginationItem
@@ -63,4 +65,4 @@ const CategoriesPagination = ({
   );
 }
 
-export default CategoriesPagination;
+export default PaginationComponent;
