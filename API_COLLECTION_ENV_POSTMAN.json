@@ -1,0 +1,14 @@
+{
+	"id": "a4c23979-6aae-4a7f-9c88-7b8a59f245e1",
+	"name": "local",
+	"values": [
+		{
+			"key": "server_url",
+			"value": "http://localhost/api/v1",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2021-01-21T20:35:16.307Z",
+	"_postman_exported_using": "Postman/7.36.1"
+}
