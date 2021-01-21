@@ -58,17 +58,20 @@ const CategoryView = (props) => {
       isOpen={state.modal}
       toggle={toggle}
       size="xl"
+      container="div"
     >
       <ModalHeader
         toggle={toggle}
         className="d-flex justify-content-between"
+        tag="div"
       >
-        Prank Ideas
+        <h5>Prank Ideas</h5>
         <SearchBox
           onSearch={getIdeasBySearch}
           onSearchChange={handleSearchChange}
         />
       </ModalHeader>
+      
       {
         !ideas ? (
           <LoadingScreen />
