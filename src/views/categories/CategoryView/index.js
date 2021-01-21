@@ -1,38 +1,107 @@
-import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import React, {
+  useEffect
+} from 'react';
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ListGroup,
+  ListGroupItem
+} from 'reactstrap';
+import {
+  getIdeas,
+  setQuery
+} from '../../../slices/ideas';
+import { useDispatch, useSelector } from '../../../store';
+import Pagination from '../../../components/Pagination';
+import SearchBox from '../../../components/SearchBox';
+import LoadingScreen from '../../../components/LoadingScreen';
 
-const CategoryModal = (props, {
-  className,
-  title,
-  ...rest
-}) => {
+const CategoryView = (props) => {
   console.log('props', props);
-  const { modal } = props.location.state;
+  const dispatch = useDispatch();
+  const { state, pathname } = props.location;
+  const { paging, ideas, query } = useSelector((state) => state.ideas);
+
+  const handlePageClick = (e, index) => {
+    dispatch(getIdeas(index, pathname, query));
+  };
+
+  const handlePreviousClick = (e, index) => {
+    dispatch(getIdeas(index - 1, pathname, query));
+  };
+
+  const handleNextClick = (e, index) => {
+    dispatch(getIdeas(index + 1, pathname, query));
+  };
+
+  const handleSearchChange = (e) => {
+    dispatch(setQuery(e.target.value))
+  }
+
+  const getIdeasBySearch = () => {
+    dispatch(getIdeas(0, pathname, query));
+  }
+
+  useEffect(() => {
+    dispatch(getIdeas(0, pathname));
+  }, [dispatch, pathname]);
+
   const toggle = () => {
     props.history.goBack();
   }
 
   return (
     <Modal
-      isOpen={modal}
+      isOpen={state.modal}
       toggle={toggle}
-      className={className}
-      {...rest}
+      size="xl"
     >
-      <ModalHeader toggle={toggle}>Modal title</ModalHeader>
-      <ModalBody>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </ModalBody>
+      <ModalHeader
+        toggle={toggle}
+        className="d-flex justify-content-between"
+      >
+        Prank Ideas
+        <SearchBox
+          onSearch={getIdeasBySearch}
+          onSearchChange={handleSearchChange}
+        />
+      </ModalHeader>
+      {
+        !ideas ? (
+          <LoadingScreen />
+        ) : (
+          <ModalBody>
+            <ListGroup>
+              {
+                ideas.map(idea => {
+                  return (
+                    <ListGroupItem
+                      key={idea.id}
+                    >
+                      {idea.title}
+                    </ListGroupItem>
+                  )
+                })
+              }
+            </ListGroup>
+            <Pagination
+              currentPage={paging.page}
+              countPage={paging.pageCount}
+              onNext={handleNextClick}
+              onPrevious={handlePreviousClick}
+              onPageClick={handlePageClick}
+            />
+          </ModalBody>
+        )
+      }
       <ModalFooter>
-        <Button color="primary" onClick={toggle}>Do Something</Button>{' '}
         <Button color="secondary" onClick={toggle}>Cancel</Button>
       </ModalFooter>
     </Modal>
   );
 }
 
-export default CategoryModal;
+export default CategoryView;
