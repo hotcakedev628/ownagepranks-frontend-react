@@ -1,21 +1,16 @@
 import React, {
   useEffect,
-  useState,
-  useCallback
 } from 'react';
 import {
   Route
 } from 'react-router-dom';
-// import { useDispatch, useSelector } from '../../../store';
 import { Link } from 'react-router-dom';
-import useIsMountedRef from '../../../hooks/useIsMountedRef';
-// import {
-//   getCategories
-// } from '../../slices/categories';
-import { appConfig } from '../../../config';
-import axios from 'axios';
+import { useDispatch, useSelector } from '../../../store';
+import {
+  getCategories
+} from '../../../slices/categories';
 import { ListGroup, ListGroupItem } from 'reactstrap';
-import CategoriesPagination from '../../../components/Pagination';
+import Pagination from '../../../components/Pagination';
 import LoadingScreen from '../../../components/LoadingScreen';
 import CategoryView from '../CategoryView';
 
@@ -34,57 +29,27 @@ const availableCategories = [
 const CategoryList = ({
   ...rest
 }) => {
-  const [categories, setCategories] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paging, setPaging] = useState(null);
-  const [isLoading, setLoading] = useState(false);
-  // const dispatch = useDispatch();
-  const isMountedRef = useIsMountedRef();
-  // const { isModalOpen } = useSelector((state) => state.categories);
+  const dispatch = useDispatch();
+  const { paging, categories } = useSelector((state) => state.categories);
 
   const handlePageClick = (e, index) => {
-    console.log(index);
-    setCurrentPage(index);
-    getCategories(index);
+    dispatch(getCategories(index));
   };
 
   const handlePreviousClick = (e, index) => {
-    setCurrentPage(currentPage - 1);
+    dispatch(getCategories(index - 1));
   };
 
   const handleNextClick = (e, index) => {
-    setCurrentPage(currentPage + 1);
+    dispatch(getCategories(index + 1));
   };
 
-  const getCategories = useCallback(async (currentPage) => {
-    try {
-      setLoading(true);
-
-      const response = await axios.get(`${appConfig.backendUrl}/prank/categories`, {
-        params: {
-          limit: 5,
-          page: currentPage
-        }
-      });
-      console.log(response);
-
-      if (isMountedRef.current) {
-        setCategories(response.data.categories);
-        setPaging(response.data.paging);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [isMountedRef]);
-
   useEffect(() => {
-    getCategories();
-  }, [getCategories]);
+    dispatch(getCategories());
+  }, [dispatch]);
 
   return (
-    isLoading || !categories ? (
+    !categories ? (
       <LoadingScreen />
     ) : (
       <div
@@ -110,20 +75,23 @@ const CategoryList = ({
             )
           })}
         </ListGroup>
-        <CategoriesPagination
+        <Pagination
           currentPage={paging.page}
           countPage={paging.pageCount}
           onPageClick={handlePageClick}
-          onPreviousClick={e => handlePreviousClick(e)}
-          onNextClick={e => handleNextClick(e)}
+          onPrevious={e => handlePreviousClick(e)}
+          onNext={e => handleNextClick(e)}
         />
         {
           availableCategories.map(category => {
             return (
               <Route
+                key={category.slug}
                 path={`/${category.slug}`}
                 exact={true}
-                render={(props) => (<CategoryView {...props} />)}
+                render={(props) => (
+                  <CategoryView {...props} />
+                )}
               />
             )
           })

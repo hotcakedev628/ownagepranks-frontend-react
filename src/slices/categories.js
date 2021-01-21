@@ -3,9 +3,8 @@ import axios from 'axios';
 import { appConfig } from '../config';
 
 const initialState = {
-  categories: [],
-  paging: [],
-  isLoading: false,
+  categories: null,
+  paging: null,
   isModalOpen: false,
   selectedCategory: null
 };
@@ -15,13 +14,9 @@ const slice = createSlice({
   initialState,
   reducers: {
     getCategories(state, action) {
-      const { categories } = action.payload;
+      const { categories, paging } = action.payload;
 
       state.categories = categories;
-    },
-    getPaging(state, action) {
-      const { paging } = action.payload;
-
       state.paging = paging;
     },
     startLoading(state) {
@@ -41,11 +36,15 @@ const slice = createSlice({
 
 export const reducer = slice.reducer;
 
-export const getCategories = () => async (dispatch) => {
-  const response = await axios.get(`${appConfig.backendUrl}/prank/categories`);
+export const getCategories = (page) => async (dispatch) => {
+  const response = await axios.get(`${appConfig.backendUrl}/app-categories/categories`, {
+    params: {
+      limit: 5,
+      page
+    }
+  });
 
   dispatch(slice.actions.getCategories(response.data));
-  dispatch(slice.actions.getPaging(response.data));
 };
 
 export const startLoading = () => (dispatch) => {
